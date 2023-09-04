@@ -18,23 +18,48 @@
             </div>
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
-                <li>
-                    <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
-                    <a class="btn btn-link" href="{% url 'onlinecourse:logout' %}">Logout</a>
-                </li>
-                {% else %}
-                <li>
-                    <form class="form-inline" action="{% url 'onlinecourse:login' %}" method="post">
-                        {% csrf_token %}
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Username" name="username" >
-                            <input type="password" class="form-control" placeholder="Username" name="psw" >
-                            <button class="btn btn-primary" type="submit">Login</button>
-                            <a class="btn btn-link" href="{% url 'onlinecourse:registration' %}">Sign Up</a>
-                        </div>
-                    </form>
-                </li>
-                {% endif %}
+    <!-- Show course exam with a list of questions and choices -->
+    <div class="exam">
+        <h2>Course Exam</h2>
+        <!-- Use Bootstrap Collapse to hide exam (Example in comment) -->
+        <div class="collapse" id="examCollapse">
+            {% for question in questions %}
+                <div class="question">
+                    <h4>{{ question.question_text }}</h4>
+                    <ul class="choices">
+                        {% for choice in question.choice_set.all %}
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="selected_choices" value="{{ choice.id }}">
+                                    {{ choice.choice_content }}
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+            <!-- Example form to collect selected choice IDs -->
+            <form method="post" action="{% url 'onlinecourse:submit_exam' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Submit Exam</button>
+            </form>
+        </div>
+    </div>
+{% else %}
+    <!-- Display login form if user is not authenticated -->
+    <li>
+        <form class="form-inline" action="{% url 'onlinecourse:login' %}" method="post">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Username" name="username" >
+                <input type="password" class="form-control" placeholder="Password" name="password" >
+                <button class="btn btn-primary" type="submit">Login</button>
+                <a class="btn btn-link" href="{% url 'onlinecourse:registration' %}">Sign Up</a>
+            </div>
+        </form>
+    </li>
+{% endif %}
+
             </ul>
         </div>
     </nav>
